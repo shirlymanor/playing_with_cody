@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Question Answering App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        #chat {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #bdc3c7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        #question {
+            width: 75%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        #question:focus {
+            outline: none;
+            border-color: #2980b9;
+        }
+        #submit {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        #submit:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        #submit:active {
+            transform: translateY(0);
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-message {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        .ai-message {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Question Answering App</h1>
+    <div id="chat"></div>
+    <input type="text" id="question" placeholder="Ask a question...">
+    <button id="submit">Ask</button>
+
+    <script>
+        const chatDiv = document.getElementById('chat');
+        const questionInput = document.getElementById('question');
+        const submitButton = document.getElementById('submit');
+        
+        submitButton.addEventListener('click', askQuestion);
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askQuestion();
+        });
+
+        function askQuestion() {
+            const question = questionInput.value.trim();
+            if (question) {
+                addMessage('You', question, 'user-message');
+                fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    addMessage('AI', data.answer, 'ai-message');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addMessage('AI', 'Sorry, I encountered an error.', 'ai-message');
+                });
+                questionInput.value = '';
+            }
+        }
+
+        function addMessage(sender, message, className) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + className;
+            messageDiv.innerHTML = '<strong>' + sender + ':</strong> ' + message;
+            chatDiv.appendChild(messageDiv);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
