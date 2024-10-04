@@ -1,4 +1,4 @@
-# playing with cody
+# playing with Cody
 Create an AI Gent for questions and answers
 
 ## Pre-requisites 
